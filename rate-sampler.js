@@ -190,13 +190,26 @@ var data = { AL: [ [ 0, 0.02 ], [ 500, 0.04 ], [ 3000, 0.05 ] ],
 
 var summaryStats = [];
 var maxIncome = 1500001;
+var previousStats = [];
 for (var income = 0, l = maxIncome; income < l; income += 50) {
     var rates = [];
     for (var state in data) {
         var rate = findRateForState(income, data[state]);
         rates.push(rate);
     }
-    summaryStats.push(summarizeStats(income, rates));
+
+    newStats = summarizeStats(income, rates);
+    if (previousStats === []) {
+      summaryStats.push(newStats);
+      previousStats = newStats;
+    } else if (previousStats[1] !== newStats[1] ||
+      previousStats[2] !== newStats[2] ||
+      previousStats[3] !== newStats[3]) {
+        summaryStats.push(newStats);
+        previousStats = newStats;
+    } else {
+      previousStats = newStats;
+    }
 }
 
 function findRateForState(income, state) {
