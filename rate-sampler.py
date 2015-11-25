@@ -52,10 +52,6 @@ data = {
     'WY': [[0, 0]]
 }
 
-summary_stats = []
-max_income = 1200000
-previous_stats = []
-
 def find_rate_for_state(income, brackets):
     rate = 0
     for bracket in reversed(brackets):
@@ -68,29 +64,35 @@ def find_rate_for_state(income, brackets):
 def summarize_stats(income, rates):
     rates.sort()
 
-    low = rates[0]
+    low = min(rates)
     first_quartile = rates[12]
     median = rates[25]
     third_quartile = rates[37]
-    high = rates[50]
+    high = max(rates)
 
     return [income, low, first_quartile, median, third_quartile, high]
 
-for income in range(0, max_income+1):
-    rates = []
-    for state in data:
-        rate = find_rate_for_state(income, data[state])
-        rates.append(rate)
+def sample_brackets(data, max_income=1200000):
+    summary_stats = []
+    previous_stats = []
 
-    new_stats = summarize_stats(income, rates)
+    for income in range(0, max_income+1):
+        rates = []
+        for state in data:
+            rate = find_rate_for_state(income, data[state])
+            rates.append(rate)
+    
+        new_stats = summarize_stats(income, rates)
+    
+        if previous_stats == []:
+            summary_stats.append(new_stats)
+            previous_stats = new_stats
+        elif (previous_stats[1] != new_stats[1] or
+            previous_stats[2] != new_stats[2] or
+            previous_stats[3] != new_stats[3]):
+            summary_stats.append(new_stats)
+            previous_stats = new_stats
 
-    if previous_stats == []:
-        summary_stats.append(new_stats)
-        previous_stats = new_stats
-    elif (previous_stats[1] != new_stats[1] or
-        previous_stats[2] != new_stats[2] or
-        previous_stats[3] != new_stats[3]):
-        summary_stats.append(new_stats)
-        previous_stats = new_stats
+    return summary_stats
 
-print(summary_stats)
+print(sample_brackets(data, 2000))
