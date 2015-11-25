@@ -189,7 +189,7 @@ var data = { AL: [ [ 0, 0.02 ], [ 500, 0.04 ], [ 3000, 0.05 ] ],
   WY: [ [ 0, 0 ] ] };
 
 var summaryStats = [];
-var maxIncome = 1500001;
+var maxIncome = 1200001;
 var previousStats = [];
 for (var income = 0, l = maxIncome; income < l; income += 50) {
     var rates = [];
@@ -207,8 +207,6 @@ for (var income = 0, l = maxIncome; income < l; income += 50) {
       previousStats[3] !== newStats[3]) {
         summaryStats.push(newStats);
         previousStats = newStats;
-    } else {
-      previousStats = newStats;
     }
 }
 
@@ -226,13 +224,18 @@ function findRateForState(income, state) {
 
 function summarizeStats(income, rates) {
   var low = 0;
+  var firstQuartile = 0;
   var median = 0;
+  var thirdQuartile = 0;
   var high = 0;
   rates.sort(sortRates);
   low = rates[0];
-  high = rates[50];
+  firstQuartile = rates[12];
   median = rates[25];
-  return [income, low, median, high];
+  thirdQuartile = rates[37];
+  high = rates[50];
+
+  return [income, low, firstQuartile, median, thirdQuartile, high];
 }
 
 function sortRates(a, b) {
