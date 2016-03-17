@@ -1,3 +1,11 @@
+"""
+Script to generate summary tax rate data. Saves as CSV file a set of data.
+Each row shows, for a given level of income, the minimum, first quartile, median, third quartile, and maximum.
+Each row is generated only if there is a change in one of the summary stats from the previous income level.
+"""
+
+import csv
+
 data = {
     'AL': [[0, 0.02], [500, 0.04], [3000, 0.05]],
     'AK': [[0, 0]],
@@ -53,6 +61,11 @@ data = {
 }
 
 def find_rate_for_state(income, brackets):
+    """
+    Goes backward through income levels and rates,
+    checking if the supplied income is greater than or equal to a given bracket.
+    Returns the highest rate that matches the supplied income level.
+    """
     rate = 0
     for bracket in reversed(brackets):
         if income >= bracket[0]:
@@ -73,6 +86,7 @@ def summarize_stats(income, rates):
     return [income, low, first_quartile, median, third_quartile, high]
 
 def sample_brackets(data, max_income=1200000):
+    count = 1
     summary_stats = []
     previous_stats = []
 
@@ -89,10 +103,17 @@ def sample_brackets(data, max_income=1200000):
             previous_stats = new_stats
         elif (previous_stats[1] != new_stats[1] or
             previous_stats[2] != new_stats[2] or
-            previous_stats[3] != new_stats[3]):
+            previous_stats[3] != new_stats[3] or
+            previous_stats[4] != new_stats[4] or
+            previous_stats[5] != new_stats[5]):
             summary_stats.append(new_stats)
             previous_stats = new_stats
+            count += 1
 
+    print(count, "Samples Returned")
     return summary_stats
 
-print(sample_brackets(data, 2000))
+csv_samples = open('rates_samples.csv', 'wt', encoding='utf-8', newline='\n')
+write_samples = csv.writer(csv_samples)
+write_samples.writerows(sample_brackets(data, 1200000))
+write_samples.close()
